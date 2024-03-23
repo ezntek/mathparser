@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "ast.h"
 #include "lexer.h"
@@ -15,7 +16,7 @@ size_t gen_orphans(Ast_Node*** res, const Token* toks, size_t ntoks) {
         exit(EXIT_FAILURE);
     }
 
-    for (size_t i = 0; i < ntoks || toks[i].kind != TOKEN_EOF; i++) {
+    for (size_t i = 0; toks[i].kind != TOKEN_EOF; i++) {
         if (nodes_len + 1 > nodes_cap) {
             nodes = realloc(nodes, sizeof(Ast_Node*) * 5);
 
@@ -52,12 +53,14 @@ Ast_Node* gen_ast(Ast_Node** orphans, size_t norphans) {
 
                 if (Stack_is_empty(&roots)) {
                     Stack_push(&roots, Ast_Node_new());
+                    Stack_top(&roots)->lchild = currnode;
+                    break;
                 }
 
-                if (Stack_top(&roots)->lchild != NULL) {
+                if (Stack_top(&roots)->lchild == NULL) {
                     Stack_top(&roots)->lchild = currnode;
                     currnode->parent = Stack_top(&roots);
-                } else if (Stack_top(&roots)->rchild) {
+                } else if (Stack_top(&roots)->rchild == NULL) {
                     Stack_top(&roots)->rchild = currnode;
                     currnode->parent = Stack_top(&roots);
                 }
@@ -83,7 +86,6 @@ Ast_Node* gen_ast(Ast_Node** orphans, size_t norphans) {
                     Stack_top(&roots)->lchild = oldroot;
                     oldroot->parent = Stack_top(&roots);
                 } else {
-                    // yay tree reordering
                     Ast_Node* oldroot = Stack_pop(&roots);
                     Stack_push(&roots, Ast_Node_new());
                     Stack_top(&roots)->lchild = oldroot->rchild;
@@ -96,7 +98,61 @@ Ast_Node* gen_ast(Ast_Node** orphans, size_t norphans) {
                 fprintf(stderr, "brackets not implemented");
             } break;
         }
+
+        pos++;
     }
 
     return Stack_top(&roots); // FIXME
+}
+
+void sprint_ast(Ast_Node* root, char* restrict buf) {
+    char left[250];
+    char right[250];
+    char* node_kind_s;
+
+    switch (root->kind) {
+        case NODE_LITERAL: {
+            node_kind_s = "literal";
+        } break;
+        case NODE_OPERATOR: {
+            node_kind_s = "operator";
+        } break;
+        case NODE_SEPARATOR: {
+            node_kind_s = "separator";
+        } break;
+    }
+
+    if (root->lchild != NULL) {
+        sprint_ast(root->lchild, left);
+    } else {
+        strcpy(left, "<null>");
+    }
+
+    if (root->rchild != NULL) {
+        sprint_ast(root->rchild, right);
+    } else {
+        strcpy(right, "<null>");
+    }
+
+    switch (root->kind) {
+        case NODE_LITERAL: {
+            snprintf(buf, 250, // NOLINT
+                     "{%s(%d), left(%s), right(%s)}", node_kind_s,
+                     root->val.lit, left, right);
+        } break;
+        case NODE_OPERATOR: {
+            snprintf(buf, 250, // NOLINT
+                     "{%s(%c), left(%s), right(%s)}", node_kind_s,
+                     root->val.sep, left, right);
+        } break;
+        case NODE_SEPARATOR: {
+            sprintf(buf, "not implemented"); // NOLINT
+        } break;
+    }
+}
+
+void print_ast(Ast_Node* root) {
+    char buf[750];
+    sprint_ast(root, buf);
+    printf("%s\n", buf);
 }

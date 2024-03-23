@@ -120,7 +120,7 @@ size_t Lexer_tokenize(Lexer* l, Token** res) {
     }
 
     while ((currtok = Lexer_next_token(l)).kind != TOKEN_EOF) {
-        if (toks_len + 1 > toks_cap) {
+        if (toks_len + 2 > toks_cap) {
             toks = realloc(toks, sizeof(Token) * (toks_cap *= 5));
 
             if (toks == NULL) {
@@ -134,6 +134,8 @@ size_t Lexer_tokenize(Lexer* l, Token** res) {
         else
             toks[toks_len++] = currtok;
     }
+
+    toks[toks_len++] = EOFTOKEN;
 
     *res = toks;
     return toks_len;

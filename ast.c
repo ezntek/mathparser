@@ -19,15 +19,7 @@ Ast_Node* Ast_Node_new() {
 }
 
 Ast_Node* Ast_Node_from_token(Token tok) {
-    Ast_Node* res;
-
-    if ((res = malloc(sizeof(Ast_Node))) == NULL) {
-        perror("malloc");
-        exit(EXIT_FAILURE);
-    }
-
-    *res = (Ast_Node){0};
-    res->lchild = res->rchild = res->parent = NULL;
+    Ast_Node* res = Ast_Node_new();
 
     if (tok.kind == TOKEN_NULL) {
         fputs("found null token in token list", stderr);

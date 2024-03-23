@@ -1,4 +1,4 @@
-SRC = main.c lexer.c stack.c queue.c
+SRC = main.c lexer.c stack.c queue.c ast.c parser.c
 CC = cc
 DEBUG_CFLAGS = -g -O0 -Wall -Wpedantic
 CFLAGS = -O2 -Wall -Wpedantic -march=native

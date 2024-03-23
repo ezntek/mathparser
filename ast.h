@@ -59,3 +59,6 @@ size_t gen_orphans(Ast_Node*** res, const Token* toks, size_t ntoks);
  * orphans is a list of Ast_Node*s
  */
 Ast_Node* gen_ast(Ast_Node** orphans, size_t norphans);
+
+void print_ast(Ast_Node* root);
+void sprint_ast(Ast_Node* root, char* restrict buf);

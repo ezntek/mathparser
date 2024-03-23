@@ -7,7 +7,13 @@
 
 void Stack_init(Stack* s) {
     s->cap = 10;
-    s->top = s->btm = calloc(s->cap, sizeof(Ast_Node*));
+    s->btm = calloc(s->cap, sizeof(Ast_Node*));
+    s->top = NULL;
+
+    if (s->btm == NULL) {
+        perror("calloc");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void Stack_deinit(Stack* s) {
@@ -15,7 +21,7 @@ void Stack_deinit(Stack* s) {
         Stack_pop(s);
 }
 
-bool Stack_is_empty(Stack* s) { return (s->top == s->btm); }
+bool Stack_is_empty(Stack* s) { return (s->top == NULL); }
 
 void Stack_push(Stack* s, Ast_Node* newelem) {
     if (s->top == s->btm + s->cap) {
@@ -29,18 +35,39 @@ void Stack_push(Stack* s, Ast_Node* newelem) {
         s->top = s->btm + s->cap;
     }
 
-    *s->top = newelem;
-    s->top++;
+    if (s->top == NULL) {
+        s->top = s->btm;
+        *s->top = newelem;
+    } else {
+        *s->top = newelem;
+        s->top++;
+    }
 }
 
 Ast_Node* Stack_pop(Stack* s) {
-    if (s->btm == s->top) {
+    Ast_Node* res;
+
+    if (s->top == NULL) {
         fputs("Stack Underflow", stderr);
-        return NULL;
+        exit(EXIT_FAILURE);
     }
 
-    s->top--;
-    return *s->top;
+    if (s->top == s->btm) {
+        res = *s->top;
+        s->top = NULL;
+    } else {
+        s->top--;
+        res = *s->top;
+    }
+
+    return res;
 }
 
-Ast_Node* Stack_top(Stack* s) { return (*s->top); }
+Ast_Node* Stack_top(Stack* s) {
+    if (s->top == NULL) {
+        fputs("Stack is empty", stderr);
+        exit(EXIT_FAILURE);
+    }
+
+    return *s->top;
+}
