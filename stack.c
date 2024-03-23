@@ -39,8 +39,8 @@ void Stack_push(Stack* s, Ast_Node* newelem) {
         s->top = s->btm;
         *s->top = newelem;
     } else {
-        *s->top = newelem;
         s->top++;
+        *s->top = newelem;
     }
 }
 

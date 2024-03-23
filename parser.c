@@ -11,7 +11,7 @@ size_t gen_orphans(Ast_Node*** res, const Token* toks, size_t ntoks) {
     size_t nodes_len = 0;
     size_t nodes_cap = 5;
 
-    if ((nodes = malloc(sizeof(Ast_Node*))) == NULL) {
+    if ((nodes = malloc(sizeof(Ast_Node*) * 5)) == NULL) {
         perror("malloc");
         exit(EXIT_FAILURE);
     }
@@ -72,8 +72,8 @@ Ast_Node* gen_ast(Ast_Node** orphans, size_t norphans) {
                     exit(EXIT_FAILURE);
                 }
 
-                if (Stack_top(&roots)->lchild != NULL ||
-                    Stack_top(&roots)->rchild != NULL) {
+                if (Stack_top(&roots)->lchild == NULL ||
+                    Stack_top(&roots)->rchild == NULL) {
                     Stack_top(&roots)->kind = currnode->kind;
                     Stack_top(&roots)->val = currnode->val;
                     break;
@@ -85,12 +85,19 @@ Ast_Node* gen_ast(Ast_Node** orphans, size_t norphans) {
                     Stack_push(&roots, Ast_Node_new());
                     Stack_top(&roots)->lchild = oldroot;
                     oldroot->parent = Stack_top(&roots);
+
+                    Stack_top(&roots)->kind = currnode->kind;
+                    Stack_top(&roots)->val = currnode->val;
                 } else {
                     Ast_Node* oldroot = Stack_pop(&roots);
                     Stack_push(&roots, Ast_Node_new());
                     Stack_top(&roots)->lchild = oldroot->rchild;
                     oldroot->rchild = Stack_top(&roots);
                     Stack_top(&roots)->parent = oldroot;
+
+                    Stack_top(&roots)->kind = currnode->kind;
+                    Stack_top(&roots)->val = currnode->val;
+
                     Stack_push(&roots, oldroot);
                 }
             } break;
