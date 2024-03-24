@@ -111,18 +111,6 @@ void sprint_ast(Ast_Node* root, char* restrict buf) {
     char right[250];
     char* node_kind_s;
 
-    switch (root->kind) {
-        case NODE_LITERAL: {
-            node_kind_s = "literal";
-        } break;
-        case NODE_OPERATOR: {
-            node_kind_s = "operator";
-        } break;
-        case NODE_SEPARATOR: {
-            node_kind_s = "separator";
-        } break;
-    }
-
     if (root->lchild != NULL) {
         sprint_ast(root->lchild, left);
     } else {
