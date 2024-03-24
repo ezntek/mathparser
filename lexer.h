@@ -9,7 +9,7 @@
 
 #define WHITESPACES "\t\n "
 #define SEPS        "()"
-#define OPS         "+-/*"
+#define OPS         "+-/*^%"
 #define NUMS        "1234567890"
 
 typedef enum {

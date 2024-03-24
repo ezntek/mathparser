@@ -15,6 +15,8 @@ typedef enum {
     OP_SUB = '-',
     OP_MUL = '*',
     OP_DIV = '/',
+    OP_POW = '^',
+    OP_MOD = '%',
 } Ast_Operator;
 
 typedef union {
@@ -38,10 +40,8 @@ typedef struct Ast_Node {
 } Ast_Node;
 
 static const int OPORDER[] = {
-    [OP_ADD] = 0,
-    [OP_SUB] = 0,
-    [OP_MUL] = 1,
-    [OP_DIV] = 1,
+    [OP_ADD] = 0, [OP_SUB] = 0, [OP_MUL] = 1,
+    [OP_DIV] = 1, [OP_MOD] = 1, [OP_POW] = 2,
 };
 
 Ast_Node* Ast_Node_new(void);
